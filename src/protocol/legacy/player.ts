@@ -68,7 +68,7 @@ export class PlayerService implements LegacyProtocolService {
         this.socket.removeListener('PlayerMessagesToServer', this.#handleMessage);
         this.socket.removeListener('PlayerControlsInputAction', this.#handleInputAction);
         this.stage.removeListener('tick', this.#handleTick);
-        this.stage.removeListener('playerJoined', this.#handlePlayerLeave);
+        this.stage.removeListener('playerJoined', this.#handlePlayerJoin);
         this.stage.removeListener('playerLeft', this.#handlePlayerLeave);
         this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
     }
