@@ -1,0 +1,13 @@
+{
+    "name": "paint-io-teams-server",
+    "version": "0",
+    "scripts": {
+        "start": "tsc -b && node dist/index.js"
+    },
+    "dependencies": {
+        "socket.io": "^4.3.1"
+    },
+    "devDependencies": {
+        "typescript": "^4.4.4"
+    }
+}
