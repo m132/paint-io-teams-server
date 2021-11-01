@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import { Stage } from '../../model'
+import { Stage } from '../../model';
 import { LegacyProtocolService } from './model';
 
 export class PingService implements LegacyProtocolService {
@@ -12,7 +12,7 @@ export class PingService implements LegacyProtocolService {
         public stage: Stage
     ) {
         socket.data.services.push(this);
-        
+
         this.socket = socket;
         this.stage = stage;
 
@@ -25,12 +25,12 @@ export class PingService implements LegacyProtocolService {
         socket.on('SystemLatencyPong', this.#handlePong);
     }
 
-    #handlePong = (lastMs: number) => 
-       this.socket.data.player.ping = performance.now() - this.#pingOffset - lastMs;
+    #handlePong = (lastMs: number) =>
+        this.socket.data.player.ping = performance.now() - this.#pingOffset - lastMs;
 
     unregister() {
         clearInterval(this.#pingInterval);
         this.socket.removeListener('SystemLatencyPong', this.#handlePong);
-        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1)
+        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
     }
 }

@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 
 import { Server, Socket } from 'socket.io';
 
-import { ServerState, Protocol, Stage } from '../../model'
+import { ServerState, Protocol, Stage } from '../../model';
 import { LegacyProtocolService } from './model';
 import { CatchAllService } from './catch-all';
 import { SystemService } from './system';
@@ -12,7 +12,7 @@ export default class LegacyProtocol extends EventEmitter implements Protocol {
     #io: Server;
 
     constructor(server_state: ServerState) {
-        super()
+        super();
         this.#stage = server_state.stages[0];
 
         this.#io = new Server(3000, {
@@ -31,8 +31,8 @@ export default class LegacyProtocol extends EventEmitter implements Protocol {
         this.emit('connection');
         console.log(`LEGACY#${socket.id}: New connection from ${socket.handshake.address}`);
 
-        socket.data.services = []
-        
+        socket.data.services = [];
+
         new CatchAllService(socket, this.#stage);
 
         /* legacy game protocol */
@@ -40,8 +40,8 @@ export default class LegacyProtocol extends EventEmitter implements Protocol {
 
         socket.on('disconnect', (reason) => {
             socket.data.services.reduceRight(
-                (prev: never, cur: LegacyProtocolService) => cur.unregister());    
-            this.emit('disconnect')
+                (prev: never, cur: LegacyProtocolService) => cur.unregister());
+            this.emit('disconnect');
             console.log(`LEGACY#${socket.id}: Disconnected (${reason})`);
         });
 

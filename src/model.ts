@@ -3,27 +3,27 @@ import { EventEmitter } from 'events';
 export interface ServerState {
     protocols: Protocol[],
     stages: Stage[]
-};
+}
 
 export interface Protocol {
     // FIXME: narrow it down
     // new (server_state: ServerState): void;
-};
+}
 
 export enum Direction {
     LEFT,
     UP,
     RIGHT,
     DOWN
-};
+}
 
-export type Coordinates = [x: number, y: number]
+export type Coordinates = [x: number, y: number];
 
 export class Player {
     coordinates: Coordinates = [0, 0];
     direction: Direction = Direction.DOWN;
     velocity: number = 4;
-    
+
     ping: number = 0;
 
     // FIXME: it shouldn't be possible to create a Player directly
@@ -94,7 +94,7 @@ export class Stage extends EventEmitter {
     tick(elapsedMs: number): this {
         let delta = elapsedMs / 1000;
         this.emit('beforeTick', delta);
-    
+
         // interpolate coordinates of all players
         this.players.forEach((player: Player) => {
             switch (player.direction) {
@@ -120,7 +120,7 @@ export class Stage extends EventEmitter {
                     break;
             }
         });
-        
+
         this.emit('tick', delta);
         return this;
     }

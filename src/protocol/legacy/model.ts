@@ -3,7 +3,8 @@ import { Direction, Player, Stage } from '../../model';
 export interface LegacyProtocolService {
     unregister: () => void
 }
-type SerializedFacing = 'left' | 'up' | 'right' | 'down'
+
+type SerializedFacing = 'left' | 'up' | 'right' | 'down';
 
 // TODO: split this
 export interface SerializedPlayer {

@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import { Direction, Player, Stage } from '../../model'
+import { Direction, Player, Stage } from '../../model';
 import { LegacyProtocolService, serializePlayer } from './model';
 
 export class PlayerService implements LegacyProtocolService {
@@ -38,7 +38,7 @@ export class PlayerService implements LegacyProtocolService {
                 player.direction = Direction.DOWN;
                 break;
             default:
-                console.warn(`${socket.id}: Player issued an unknown input action:`, escape(action))
+                console.warn(`${socket.id}: Player issued an unknown input action:`, escape(action));
         }
     };
 
@@ -47,11 +47,11 @@ export class PlayerService implements LegacyProtocolService {
         this.socket.emit('PlayerMessagesFromServer', {
             clientId: this.socket.id,
             messageId: id
-        })
+        });
         this.socket.broadcast.emit('PlayerMessagesFromServer', {
             clientId: this.socket.id,
             messageId: id
-        })
+        });
     }
 
     #handleTick = () =>

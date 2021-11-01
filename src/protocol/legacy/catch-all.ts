@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 
-import { Stage } from '../../model'
+import { Stage } from '../../model';
 import { LegacyProtocolService } from './model';
 
 export class CatchAllService implements LegacyProtocolService {
@@ -9,7 +9,7 @@ export class CatchAllService implements LegacyProtocolService {
         public stage: Stage
     ) {
         socket.data.services.push(this);
-        
+
         this.socket = socket;
         this.stage = stage;
 
@@ -29,9 +29,9 @@ export class CatchAllService implements LegacyProtocolService {
                 console.warn(`LEGACY#${this.socket.id}: Unknown event received:`, event);
         }
     }
-        
+
     unregister() {
         this.socket.offAny(this.#handleAny);
-        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1)
+        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
     }
 }
