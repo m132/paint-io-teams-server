@@ -1,29 +1,38 @@
-import { Socket } from 'socket.io';
+import { Direction, Stage } from '../../model';
+import { LegacyProtocol } from './index';
+import { LegacyPlayer, LegacyProtocolService, serializePlayer } from './model';
 
-import { Direction, Player, Stage } from '../../model';
-import { LegacyProtocolService, serializePlayer } from './model';
-
-export class PlayerService implements LegacyProtocolService {
+export class PlayerService extends LegacyProtocolService {
     constructor(
-        public socket: Socket,
-        public stage: Stage
+        public protocol: LegacyProtocol
     ) {
-        socket.data.services.push(this);
+        super(protocol);
 
-        this.socket = socket;
-        this.stage = stage;
-
-        socket.on('PlayerControlsInputAction', this.#handleInputAction);
-        socket.on('PlayerMessagesToServer', this.#handleMessage);
-        this.stage.on('playerJoined', this.#handlePlayerJoin);
-        this.stage.on('playerLeft', this.#handlePlayerLeave);
-        this.stage.on('tick', this.#handleTick);
+        for (let stage of protocol.stages)
+            this.onStageRegistered(stage);
     }
 
-    #handleInputAction = (action: any) => {
-        let socket = this.socket;
-        let player = socket.data.player;
+    onStageRegistered = (stage: Stage) => {
+        let stageRoom = this.protocol.io.to(`stage:${stage.id}`);
 
+        stage.on('playerJoined', (player) =>
+            stageRoom.emit('PlayerNew', serializePlayer(player, stage)));
+        stage.on('playerLeft', (player) =>
+            stageRoom.emit('PlayerDisconnect', player.id));
+        stage.on('message', (player, message) =>
+            stageRoom.emit('PlayerMessagesFromServer', { clientId: player.id, messageId: message }));
+        stage.on('tick', () =>
+            stageRoom.emit('PlayersUpdate', stage.players.map((p) => serializePlayer(p, stage))));
+    };
+
+    onPlayerRegistered = (player: LegacyPlayer) => {
+        player.socket.on('PlayerControlsInputAction', (action) =>
+            this.#onInputAction(player, action));
+        player.socket.on('PlayerMessagesToServer', (message) =>
+            this.#onMessagesToServer(player, message));
+    };
+
+    #onInputAction = (player: LegacyPlayer, action: any) => {
         switch (action.inputAction) {
             case 'moveLeft':
                 player.direction = Direction.LEFT;
@@ -38,38 +47,12 @@ export class PlayerService implements LegacyProtocolService {
                 player.direction = Direction.DOWN;
                 break;
             default:
-                console.warn(`${socket.id}: Player issued an unknown input action:`, escape(action));
+                console.warn(`LEGACY#${player.id}: Player issued an unknown input action:`, escape(action));
         }
     };
 
-    // FIXME
-    #handleMessage = (id: number) => {
-        this.socket.emit('PlayerMessagesFromServer', {
-            clientId: this.socket.id,
-            messageId: id
-        });
-        this.socket.broadcast.emit('PlayerMessagesFromServer', {
-            clientId: this.socket.id,
-            messageId: id
-        });
-    }
-
-    #handleTick = () =>
-        this.socket.emit('PlayersUpdate',
-            this.stage.players.map((p) => serializePlayer(p, this.stage)));
-
-    #handlePlayerJoin = (p: Player) =>
-        this.socket.emit('PlayerNew', serializePlayer(p, this.stage));
-
-    #handlePlayerLeave = (p: Player) =>
-        this.socket.emit('PlayerDisconnect', p.id);
-
-    unregister() {
-        this.socket.removeListener('PlayerMessagesToServer', this.#handleMessage);
-        this.socket.removeListener('PlayerControlsInputAction', this.#handleInputAction);
-        this.stage.removeListener('tick', this.#handleTick);
-        this.stage.removeListener('playerJoined', this.#handlePlayerJoin);
-        this.stage.removeListener('playerLeft', this.#handlePlayerLeave);
-        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
+    #onMessagesToServer = (player: LegacyPlayer, message: number) => {
+        if (player.stage)
+            player.stage.emit('message', player, message);
     }
 }

@@ -1,7 +1,32 @@
-import { Direction, Player, Stage } from '../../model';
+import { Socket } from 'socket.io';
 
-export interface LegacyProtocolService {
-    unregister: () => void
+import { Direction, Player, Stage } from '../../model';
+import { LegacyProtocol } from '.';
+
+export class LegacyPlayer extends Player {
+    pingInterval: ReturnType<typeof setInterval> | null = null;
+
+    constructor(
+        public socket: Socket
+    ) {
+        super();
+        this.socket = socket;
+
+        this.id = socket.id;
+    }
+}
+
+export class LegacyProtocolService {
+    constructor(
+        public protocol: LegacyProtocol
+    ) {
+        this.protocol = protocol;
+    }
+
+    onPlayerRegistered(player: LegacyPlayer) { }
+    onPlayerUnregistered(player: LegacyPlayer) { }
+    onStageRegistered(stage: Stage) { }
+    onStageUnregistered(stage: Stage) { }
 }
 
 type SerializedFacing = 'left' | 'up' | 'right' | 'down';
@@ -41,12 +66,8 @@ export function serializePlayer(player: Player, stage: Stage) {
         x: Math.round(player.coordinates[0] * stage.tileMap.blockSize),
         y: Math.round(player.coordinates[1] * stage.tileMap.blockSize),
         facing: Direction[player.direction].toLowerCase() as SerializedFacing,
-        level: 69,
+        level: 1,
         isInvisible: false,
         isAdmin: false
     }
-}
-
-export function deserializePlayer(id: string, serialized: SerializedPlayer, stage: Stage): Player {
-    return stage.createPlayer(id, serialized.name, serialized.country, serialized.characterId);
 }

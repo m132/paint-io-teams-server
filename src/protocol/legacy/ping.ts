@@ -1,36 +1,40 @@
 import { Socket } from 'socket.io';
 
-import { Stage } from '../../model';
-import { LegacyProtocolService } from './model';
+import { LegacyProtocol } from '.';
+import { LegacyProtocolService, LegacyPlayer } from './model';
 
-export class PingService implements LegacyProtocolService {
-    #pingOffset: number;
-    #pingInterval: ReturnType<typeof setInterval>;
-
+export class PingService extends LegacyProtocolService {
     constructor(
-        public socket: Socket,
-        public stage: Stage
+        public protocol: LegacyProtocol
     ) {
-        socket.data.services.push(this);
+        super(protocol);
 
-        this.socket = socket;
-        this.stage = stage;
-
-        this.#pingOffset = performance.now();
-        this.#pingInterval = setInterval(() => {
-            /* TODO: make it less forgeable */
-            socket.emit('SystemLatencyPing', performance.now() - this.#pingOffset);
-        }, 1000);
-
-        socket.on('SystemLatencyPong', this.#handlePong);
+        this.protocol.io.on('connection', this.#onConnection);
     }
 
-    #handlePong = (lastMs: number) =>
-        this.socket.data.player.ping = performance.now() - this.#pingOffset - lastMs;
+    #onConnection = (socket: Socket) => {
+        socket.on('sendPing', () => {
+            console.log(`LEGACY#${socket.id}: Pong`);
+            socket.emit('sendPong');
+        });
+        socket.emit('ready');
+    }
 
-    unregister() {
-        clearInterval(this.#pingInterval);
-        this.socket.removeListener('SystemLatencyPong', this.#handlePong);
-        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
+    onPlayerRegistered = (player: LegacyPlayer) => {
+        let offset = performance.now();
+
+        player.pingInterval = setInterval(() =>
+            player.socket.emit('SystemLatencyPing', performance.now() - offset),
+            1000);
+
+        player.socket.on('SystemLatencyPong', (lastMs: number) =>
+            player.ping = performance.now() - offset - lastMs
+        );
+    };
+
+    onPlayerUnregistered = (player: LegacyPlayer) => {
+        if (player.pingInterval)
+            clearInterval(player.pingInterval);
+        player.pingInterval = null;
     }
 }

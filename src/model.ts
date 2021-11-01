@@ -1,11 +1,6 @@
 import { EventEmitter } from 'events';
 
-export interface ServerState {
-    protocols: Protocol[],
-    stages: Stage[]
-}
-
-export interface Protocol {
+export interface Protocol extends EventEmitter {
     // FIXME: narrow it down
     // new (server_state: ServerState): void;
 }
@@ -20,23 +15,20 @@ export enum Direction {
 export type Coordinates = [x: number, y: number];
 
 export class Player {
-    coordinates: Coordinates = [0, 0];
+    id: string = '';
+    name: string = '';
+    country: string = '';
+    characterId: number = 0;
+
+    coordinates: Coordinates;
     direction: Direction = Direction.DOWN;
     velocity: number = 4;
+    stage: Stage | null = null;
 
     ping: number = 0;
 
-    // FIXME: it shouldn't be possible to create a Player directly
-    constructor(
-        public id: string,
-        public name: string,
-        public country: string,
-        public characterId: number
-    ) {
-        this.id = id;
-        this.name = name;
-        this.country = country;
-        this.characterId = characterId;
+    constructor() {
+        this.coordinates = [0, 0];
     }
 
     update(state: object): void {
@@ -75,24 +67,25 @@ export class Stage extends EventEmitter {
         this.#lastTick = performance.now();
     }
 
-    createPlayer(id: string, name: string, country: string, characterId: number): Player {
-        let player = new Player(id, name, country, characterId);
-
+    addPlayer(player: Player): Stage {
         player.update({
             coordinates: [
                 Math.random() * this.tileMap.width,
                 Math.random() * this.tileMap.height
-            ]
+            ],
+            stage: this
         });
 
         this.players.push(player);
         this.emit('playerJoined', player);
-        return player;
+        return this;
     }
 
-    destroyPlayer(player: Player): void {
+    removePlayer(player: Player): Stage {
+        player.stage = null;
         this.players.splice(this.players.indexOf(player), 1);
         this.emit('playerLeft', player);
+        return this;
     }
 
     tick(elapsedMs: number): this {
@@ -145,6 +138,34 @@ export class Stage extends EventEmitter {
             clearInterval(this.#interval);
             this.#interval = null;
         }
+
+        return this;
+    }
+}
+
+export class Server {
+    #protocols: Protocol[];
+    #stages: Stage[];
+
+    constructor() {
+        this.#protocols = [];
+        this.#stages = [];
+    }
+
+    registerProtocol(protocol: Protocol): Server {
+        this.#protocols.push(protocol);
+
+        for (let stage of this.#stages)
+            protocol.emit('stageRegistered', stage);
+
+        return this;
+    }
+
+    registerStage(stage: Stage): Server {
+        this.#stages.push(stage);
+
+        for (let protocol of this.#protocols)
+            protocol.emit('stageRegistered', stage);
 
         return this;
     }

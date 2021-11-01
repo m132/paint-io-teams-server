@@ -1,35 +1,37 @@
 import { Socket } from 'socket.io';
 
-import { Stage } from '../../model';
-import { LegacyProtocolService, serializePlayer } from './model';
-import { PingService } from './ping';
-import { PlayerService } from './player';
+import { LegacyProtocol } from '.';
+import { LegacyProtocolService, LegacyPlayer, serializePlayer } from './model';
 
-export class SystemService implements LegacyProtocolService {
+export class SystemService extends LegacyProtocolService {
     constructor(
-        public socket: Socket,
-        public stage: Stage
+        public protocol: LegacyProtocol
     ) {
-        socket.data.services.push(this);
-
-        this.socket = socket;
-        this.stage = stage;
-
-        socket.once('SystemHandshakeClient', this.#handleHandshake);
+        super(protocol);
+        this.protocol.io.on('connection', this.#onConnection);
     }
 
-    #handleHandshake = (handshake: any) => {
-        let socket = this.socket;
-        socket.removeListener('SystemHandshakeClient', this.#handleHandshake);
+    #onConnection = async (socket: Socket) => {
+        /* TODO: validation and type hints */
+        let handshake: any = await new Promise((resolve, reject) =>
+            socket.once('SystemHandshakeClient', (handshake: any) =>
+                resolve(handshake)
+            )
+        );
 
         console.log(`LEGACY#${socket.id}: Logged in as ${handshake.name} from ${handshake.country}`);
-        let player = socket.data.player = this.stage.createPlayer(
-            socket.id,
-            handshake.name,
-            handshake.country,
-            handshake.characterId
-        );
-        let blockSize = this.stage.tileMap.blockSize;
+        let player = socket.data.player = new LegacyPlayer(socket);
+        let stage = this.protocol.stages[0];
+        let blockSize = stage.tileMap.blockSize;
+
+        player.update({
+            id: socket.id,
+            name: handshake.name,
+            country: handshake.country,
+            characterId: handshake.characterId
+        });
+
+        stage.addPlayer(player);
 
         socket.emit('SystemHandshakeServer', {
             x: Math.round(player.coordinates[0] * blockSize),
@@ -45,9 +47,9 @@ export class SystemService implements LegacyProtocolService {
         });
 
         socket.emit('SystemLoadState', {
-            players: this.stage.players.map((p) => serializePlayer(p, this.stage)),
-            worldSize: [this.stage.tileMap.width, this.stage.tileMap.height],
-            blockSize: this.stage.tileMap.blockSize,
+            players: stage.players.map((p) => serializePlayer(p, stage)),
+            worldSize: [stage.tileMap.width, stage.tileMap.height],
+            blockSize: stage.tileMap.blockSize,
             enabledMinimap: true,
             isRoundRestartInProgress: false,
             winPercentLimit: 70,
@@ -92,13 +94,17 @@ export class SystemService implements LegacyProtocolService {
             [31, 52, 1], [28, 53, 1], [30, 53, 1], [29, 54, 1]]
         });
 
-        new PingService(socket, this.stage);
-        new PlayerService(socket, this.stage);
-    }
+        socket.join('players');
+        socket.join(`stage:${stage.id}`);
 
-    unregister() {
-        this.socket.removeListener('SystemHandshakeClient', this.#handleHandshake);
-        this.stage.destroyPlayer(this.socket.data.player);
-        this.socket.data.services.splice(this.socket.data.services.indexOf(this), 1);
-    }
+        socket.on('disconnect', () => {
+            for (let service of this.protocol.services)
+                service.onPlayerUnregistered(player);
+
+            stage.removePlayer(player);
+        });
+
+        for (let service of this.protocol.services)
+            service.onPlayerRegistered(player);
+    };
 }
