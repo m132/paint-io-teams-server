@@ -63,8 +63,12 @@ export class Stage extends EventEmitter {
     #lastTick: number = 0;
     #interval: ReturnType<typeof setInterval> | null = null;
 
-    constructor() {
+    constructor(
+        public id: string
+    ) {
         super();
+
+        this.id = id;
         this.players = [];
         this.tileMap = new TileMap(64, 64, 32);
 

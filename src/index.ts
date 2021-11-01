@@ -6,7 +6,7 @@ let server_state: ServerState = {
     stages: []
 };
 
-server_state.stages.push(new Stage().start(100));
+server_state.stages.push(new Stage('main').start(100));
 server_state.protocols.push(new LegacyProtocol(server_state));
 
 console.log('Game server started');
