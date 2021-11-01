@@ -8,14 +8,14 @@ import { CatchAllService } from './catch-all';
 import { SystemService } from './system';
 
 export default class LegacyProtocol extends EventEmitter implements Protocol {
-    #stage: Stage;
-    #io: Server;
+    stage: Stage;
+    io: Server;
 
     constructor(server_state: ServerState) {
         super();
-        this.#stage = server_state.stages[0];
+        this.stage = server_state.stages[0];
 
-        this.#io = new Server(3000, {
+        this.io = new Server(3000, {
             allowEIO3: true,
             cors: {
                 origin: 'http://localhost:9000',
@@ -23,7 +23,7 @@ export default class LegacyProtocol extends EventEmitter implements Protocol {
                 credentials: true
             }
         });
-        this.#io.on('connection', this.#handleConnection.bind(this));
+        this.io.on('connection', this.#handleConnection.bind(this));
     }
 
     #handleConnection(socket: Socket) {
@@ -33,10 +33,10 @@ export default class LegacyProtocol extends EventEmitter implements Protocol {
 
         socket.data.services = [];
 
-        new CatchAllService(socket, this.#stage);
+        new CatchAllService(socket, this.stage);
 
         /* legacy game protocol */
-        new SystemService(socket, this.#stage);
+        new SystemService(socket, this.stage);
 
         socket.on('disconnect', (reason) => {
             socket.data.services.reduceRight(
