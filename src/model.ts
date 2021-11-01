@@ -60,7 +60,7 @@ export class Stage extends EventEmitter {
 
         this.id = id;
         this.players = [];
-        this.tileMap = new TileMap(64, 64, 32);
+        this.tileMap = new TileMap(109, 109);
 
         this.#lastTick = performance.now();
     }
