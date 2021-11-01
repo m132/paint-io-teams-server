@@ -33,22 +33,24 @@ export class PlayerService extends LegacyProtocolService {
     };
 
     #onInputAction = (player: LegacyPlayer, action: any) => {
-        switch (action.inputAction) {
-            case 'moveLeft':
-                player.direction = Direction.LEFT;
-                break;
-            case 'moveUp':
-                player.direction = Direction.UP;
-                break;
-            case 'moveRight':
-                player.direction = Direction.RIGHT;
-                break;
-            case 'moveDown':
-                player.direction = Direction.DOWN;
-                break;
-            default:
-                console.warn(`LEGACY#${player.id}: Player issued an unknown input action:`, escape(action));
-        }
+        /* TODO: move this check to model */
+        if (player.direction.requested === player.direction.effective)
+            switch (action.inputAction) {
+                case 'moveLeft':
+                    player.direction.requested = Direction.LEFT;
+                    break;
+                case 'moveUp':
+                    player.direction.requested = Direction.UP;
+                    break;
+                case 'moveRight':
+                    player.direction.requested = Direction.RIGHT;
+                    break;
+                case 'moveDown':
+                    player.direction.requested = Direction.DOWN;
+                    break;
+                default:
+                    console.warn(`LEGACY#${player.id}: Player issued an unknown input action:`, escape(action));
+            }
     };
 
     #onMessagesToServer = (player: LegacyPlayer, message: number) => {

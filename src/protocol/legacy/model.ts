@@ -65,7 +65,7 @@ export function serializePlayer(player: Player, stage: Stage) {
         ping: Math.round(player.ping),
         x: Math.round(player.coordinates[0] * 32) + 16,
         y: Math.round(player.coordinates[1] * 32) + 16,
-        facing: Direction[player.direction].toLowerCase() as SerializedFacing,
+        facing: Direction[player.direction.effective].toLowerCase() as SerializedFacing,
         level: 1,
         isInvisible: false,
         isAdmin: false

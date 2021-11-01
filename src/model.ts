@@ -5,11 +5,12 @@ export interface Protocol extends EventEmitter {
     // new (server_state: ServerState): void;
 }
 
+/* odd are assumed to be horizontal, even are consequently vertical */
 export enum Direction {
-    LEFT,
-    UP,
-    RIGHT,
-    DOWN
+    LEFT = 0,
+    UP = 1,
+    RIGHT = 2,
+    DOWN = 3
 }
 
 export type Coordinates = [x: number, y: number];
@@ -21,7 +22,10 @@ export class Player {
     characterId: number = 0;
 
     coordinates: Coordinates;
-    direction: Direction = Direction.DOWN;
+    direction: {
+        effective: Direction,
+        requested: Direction
+    };
     velocity: number = 4;
     stage: Stage | null = null;
 
@@ -29,6 +33,10 @@ export class Player {
 
     constructor() {
         this.coordinates = [0, 0];
+        this.direction = {
+            effective: Direction.DOWN,
+            requested: Direction.DOWN
+        }
     }
 
     update(state: object): void {
@@ -68,8 +76,8 @@ export class Stage extends EventEmitter {
     addPlayer(player: Player): Stage {
         player.update({
             coordinates: [
-                Math.random() * this.tileMap.width,
-                Math.random() * this.tileMap.height
+                Math.round(Math.random() * this.tileMap.width),
+                Math.round(Math.random() * this.tileMap.height)
             ],
             stage: this
         });
@@ -90,29 +98,48 @@ export class Stage extends EventEmitter {
         let delta = elapsedMs / 1000;
         this.emit('beforeTick', delta);
 
-        // interpolate coordinates of all players
+        /* interpolate coordinates of all players */
         this.players.forEach((player: Player) => {
-            switch (player.direction) {
-                case Direction.LEFT:
-                    player.coordinates[0] = Math.max(
-                        0, player.coordinates[0] - (delta * player.velocity)
-                    );
-                    break;
-                case Direction.UP:
-                    player.coordinates[1] = Math.max(
-                        0, player.coordinates[1] - (delta * player.velocity)
-                    );
-                    break;
-                case Direction.RIGHT:
-                    player.coordinates[0] = Math.min(
-                        player.coordinates[0] + (delta * player.velocity), this.tileMap.width
-                    );
-                    break;
-                case Direction.DOWN:
-                    player.coordinates[1] = Math.min(
-                        player.coordinates[1] + (delta * player.velocity), this.tileMap.height
-                    );
-                    break;
+            let coords = player.coordinates;
+            let direction = player.direction;
+
+            let distance = delta * player.velocity;
+            let effectiveAxis = direction.effective % 2;
+            let effectiveAxisMax = this.tileMap[effectiveAxis ? 'height' : 'width'];
+
+            if (direction.effective & 2 ? 
+                coords[effectiveAxis] === effectiveAxisMax : 
+                coords[effectiveAxis] === 0)
+                distance = 0;
+
+            if (direction.requested % 2 === effectiveAxis)
+                direction.effective = direction.requested;
+            else {
+                /* remaining blocks to move across before changing direction */
+                let alignmentDelta = direction.effective & 2 ?
+                    1 - coords[effectiveAxis] % 1 :
+                    coords[effectiveAxis] % 1;
+
+                if (alignmentDelta === 1)
+                    alignmentDelta = 0;
+
+                if (distance >= alignmentDelta) {
+                    coords[effectiveAxis] = 
+                        (direction.effective & 2 ? Math.ceil : Math.floor)
+                        (coords[effectiveAxis]);
+                    distance -= alignmentDelta;
+                    direction.effective = direction.requested;
+                }
+            }
+
+            if (distance) {
+                coords[direction.effective % 2] +=
+                    distance * (direction.effective & 2 ? 1 : -1);
+    
+                coords[direction.effective % 2] = Math.min(
+                    Math.max(0, coords[direction.effective % 2]),
+                    this.tileMap[direction.effective % 2 ? 'height' : 'width']
+                );
             }
         });
 
