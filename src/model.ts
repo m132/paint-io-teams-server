@@ -40,11 +40,9 @@ export class TileMap {
     constructor(
         public width: number,
         public height: number,
-        public blockSize: number
     ) {
         this.width = width;
         this.height = height;
-        this.blockSize = blockSize;
     }
 }
 

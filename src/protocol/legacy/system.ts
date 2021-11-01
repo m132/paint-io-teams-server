@@ -22,7 +22,6 @@ export class SystemService extends LegacyProtocolService {
         console.log(`LEGACY#${socket.id}: Logged in as ${handshake.name} from ${handshake.country}`);
         let player = socket.data.player = new LegacyPlayer(socket);
         let stage = this.protocol.stages[0];
-        let blockSize = stage.tileMap.blockSize;
 
         player.update({
             id: socket.id,
@@ -34,8 +33,8 @@ export class SystemService extends LegacyProtocolService {
         stage.addPlayer(player);
 
         socket.emit('SystemHandshakeServer', {
-            x: Math.round(player.coordinates[0] * blockSize),
-            y: Math.round(player.coordinates[1] * blockSize),
+            x: Math.round(player.coordinates[0] * 32) + 16,
+            y: Math.round(player.coordinates[1] * 32) + 16,
             teamId: 1,
             isDead: false,
             isAdmin: false,
@@ -48,8 +47,8 @@ export class SystemService extends LegacyProtocolService {
 
         socket.emit('SystemLoadState', {
             players: stage.players.map((p) => serializePlayer(p, stage)),
-            worldSize: [stage.tileMap.width, stage.tileMap.height],
-            blockSize: stage.tileMap.blockSize,
+            worldSize: [stage.tileMap.width + 1, stage.tileMap.height + 1],
+            blockSize: 32,
             enabledMinimap: true,
             isRoundRestartInProgress: false,
             winPercentLimit: 70,
