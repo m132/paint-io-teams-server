@@ -1,5 +1,6 @@
 {
     "name": "paint-io-teams-server",
+    "license": "Apache-2.0",
     "scripts": {
         "build": "mkdir -p src/generated && echo \"{\\\"version\\\":\\\"$(git describe --always --dirty 2>/dev/null)\\\"}\" > src/generated/version.json; tsc -b",
         "start": "node dist/index.js"
