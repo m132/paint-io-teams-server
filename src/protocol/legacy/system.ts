@@ -47,7 +47,7 @@ export class SystemService extends LegacyProtocolService {
 
         socket.emit('SystemLoadState', {
             players: stage.players.map((p) => serializePlayer(p, stage)),
-            worldSize: [stage.tileMap.width + 1, stage.tileMap.height + 1],
+            worldSize: [stage.tileMap.width, stage.tileMap.height],
             blockSize: 32,
             enabledMinimap: true,
             isRoundRestartInProgress: false,

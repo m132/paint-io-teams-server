@@ -68,7 +68,7 @@ export class Stage extends EventEmitter {
 
         this.id = id;
         this.players = [];
-        this.tileMap = new TileMap(109, 109);
+        this.tileMap = new TileMap(110, 110);
 
         this.#lastTick = performance.now();
     }
@@ -76,8 +76,8 @@ export class Stage extends EventEmitter {
     addPlayer(player: Player): Stage {
         player.update({
             coordinates: [
-                Math.round(Math.random() * this.tileMap.width),
-                Math.round(Math.random() * this.tileMap.height)
+                Math.round(Math.random() * (this.tileMap.width - 1)),
+                Math.round(Math.random() * (this.tileMap.height - 1))
             ],
             stage: this
         });
@@ -105,7 +105,7 @@ export class Stage extends EventEmitter {
 
             let distance = delta * player.velocity;
             let effectiveAxis = direction.effective % 2;
-            let effectiveAxisMax = this.tileMap[effectiveAxis ? 'height' : 'width'];
+            let effectiveAxisMax = this.tileMap[effectiveAxis ? 'height' : 'width'] - 1;
 
             if (direction.effective & 2 ? 
                 coords[effectiveAxis] === effectiveAxisMax : 
@@ -138,7 +138,7 @@ export class Stage extends EventEmitter {
     
                 coords[direction.effective % 2] = Math.min(
                     Math.max(0, coords[direction.effective % 2]),
-                    this.tileMap[direction.effective % 2 ? 'height' : 'width']
+                    this.tileMap[direction.effective % 2 ? 'height' : 'width'] - 1
                 );
             }
         });
