@@ -44,6 +44,8 @@ const logger = parentLogger.sub('ServerCli');
 
 parentLogger.backends.push(new ConsoleLoggerBackend());
 
+logger.info(`${VERSION} starting...`);
+
 let server = new Server()
     .registerStage(new Stage('main').start(50));
 
