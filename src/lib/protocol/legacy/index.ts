@@ -110,16 +110,11 @@ export class LegacyProtocol extends EventEmitter implements Protocol {
             logger.debug(`Attached to stage ${stage.id}`);
         });
 
-        switch (bindURL.protocol) {
-            case 'file:':
-                this.server.listen(bindURL.pathname);
-                break;
-            case 'http:':
-                this.server.listen(parseInt(bindURL.port), bindURL.hostname);
-                break;
-        }
-
-        logger.info(`Listening on ${bindURL}`);
+        this.server.listen(
+            ...(bindURL.protocol === 'file:' ?
+                [bindURL.pathname] : [parseInt(bindURL.port || '80'), bindURL.hostname]) as any,
+            () => logger.info(`Listening on ${bindURL}`)
+        );
     }
 
     #handleConnection(socket: Socket) {
