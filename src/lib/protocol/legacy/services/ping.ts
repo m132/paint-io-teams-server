@@ -15,7 +15,7 @@ export class PingService extends LegacyProtocolService {
 
     #onConnection = (socket: Socket) => {
         socket.on('sendPing', () => {
-            logger.debug(`LEGACY#${socket.id}: Pong`);
+            logger.verbose(`LEGACY#${socket.id}: Ping request received`);
             socket.emit('sendPong');
         });
         socket.emit('ready');
