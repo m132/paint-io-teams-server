@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { createServer, Server as HTTPServer } from 'http';
 
 import { Server, Socket } from 'socket.io';
 
@@ -69,15 +70,21 @@ export class LegacyPlayer extends Player {
 }
 
 export class LegacyProtocol extends EventEmitter implements Protocol {
+    server: HTTPServer;
     stages: Stage[];
     io: Server;
     services: LegacyProtocolService[];
 
-    constructor() {
+    constructor(bindAddress?: URL | string) {
         super();
         this.stages = [];
 
-        this.io = new Server(3000, {
+        let bindURL = new URL(bindAddress ?? 'http://localhost:9000');
+        if (['http:', 'file:'].indexOf(bindURL.protocol) === -1)
+            throw new Error(`Unsupported protocol ${bindURL.protocol}, use either http: or file:`);
+
+        this.server = createServer();
+        this.io = new Server(this.server, {
             allowEIO3: true,
             cors: {
                 origin: 'http://localhost:9000',
@@ -103,7 +110,16 @@ export class LegacyProtocol extends EventEmitter implements Protocol {
             logger.debug(`Attached to stage ${stage.id}`);
         });
 
-        logger.info('Listening on http://localhost:3000/');
+        switch (bindURL.protocol) {
+            case 'file:':
+                this.server.listen(bindURL.pathname);
+                break;
+            case 'http:':
+                this.server.listen(parseInt(bindURL.port), bindURL.hostname);
+                break;
+        }
+
+        logger.info(`Listening on ${bindURL}`);
     }
 
     #handleConnection(socket: Socket) {
