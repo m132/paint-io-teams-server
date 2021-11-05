@@ -1,0 +1,34 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+
+    "compilerOptions": {
+        /* type checking */
+        "exactOptionalPropertyTypes": true,
+        // "noImplicitOverride": true, // read morea bout this
+        "noImplicitReturns": true,
+        "strict": true,
+
+        /* modules */
+        "module": "es2020",
+        "moduleResolution": "node",
+
+        /* emit */
+        "newLine": "lf",
+        "noEmitOnError": true,
+        "removeComments": true,
+
+        /* interop constraints */
+        // "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+
+        /* language and environment */
+        "target": "es2021",
+        "useDefineForClassFields": true,
+
+        /* projects */
+        "composite": true
+
+        /* output formatting */
+        // "skipLibCheck": true
+    }
+}

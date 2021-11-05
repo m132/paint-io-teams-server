@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 
-import { LegacyProtocol } from '.';
-import { LegacyProtocolService, LegacyPlayer } from './model';
+import { LegacyPlayer, LegacyProtocol } from '../index.js';
+import { LegacyProtocolService } from './index.js';
 
 export class PingService extends LegacyProtocolService {
     constructor(

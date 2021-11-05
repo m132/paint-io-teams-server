@@ -1,6 +1,6 @@
-import { Direction, Stage } from '../../model';
-import { LegacyProtocol } from './index';
-import { LegacyPlayer, LegacyProtocolService, serializePlayer } from './model';
+import { Direction, Stage } from '../../../index.js';
+import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
+import { LegacyProtocolService } from './index.js';
 
 export class PlayerService extends LegacyProtocolService {
     constructor(

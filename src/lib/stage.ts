@@ -1,58 +1,7 @@
 import { EventEmitter } from 'events';
 
-export interface Protocol extends EventEmitter {
-    // FIXME: narrow it down
-    // new (server_state: ServerState): void;
-}
-
-/* odd are assumed to be horizontal, even are consequently vertical */
-export enum Direction {
-    LEFT = 0,
-    UP = 1,
-    RIGHT = 2,
-    DOWN = 3
-}
-
-export type Coordinates = [x: number, y: number];
-
-export class Player {
-    id: string = '';
-    name: string = '';
-    country: string = '';
-    characterId: number = 0;
-
-    coordinates: Coordinates;
-    direction: {
-        effective: Direction,
-        requested: Direction
-    };
-    velocity: number = 4;
-    stage: Stage | null = null;
-
-    ping: number = 0;
-
-    constructor() {
-        this.coordinates = [0, 0];
-        this.direction = {
-            effective: Direction.DOWN,
-            requested: Direction.DOWN
-        }
-    }
-
-    update(state: object): void {
-        Object.assign(this, state);
-    }
-}
-
-export class TileMap {
-    constructor(
-        public width: number,
-        public height: number,
-    ) {
-        this.width = width;
-        this.height = height;
-    }
-}
+import { Player } from './player.js';
+import { TileMap } from './tilemap.js';
 
 export class Stage extends EventEmitter {
     players: Player[];
@@ -107,8 +56,8 @@ export class Stage extends EventEmitter {
             let effectiveAxis = direction.effective % 2;
             let effectiveAxisMax = this.tileMap[effectiveAxis ? 'height' : 'width'] - 1;
 
-            if (direction.effective & 2 ? 
-                coords[effectiveAxis] === effectiveAxisMax : 
+            if (direction.effective & 2 ?
+                coords[effectiveAxis] === effectiveAxisMax :
                 coords[effectiveAxis] === 0)
                 distance = 0;
 
@@ -124,9 +73,9 @@ export class Stage extends EventEmitter {
                     alignmentDelta = 0;
 
                 if (distance >= alignmentDelta) {
-                    coords[effectiveAxis] = 
+                    coords[effectiveAxis] =
                         (direction.effective & 2 ? Math.ceil : Math.floor)
-                        (coords[effectiveAxis]);
+                            (coords[effectiveAxis]);
                     distance -= alignmentDelta;
                     direction.effective = direction.requested;
                 }
@@ -135,7 +84,7 @@ export class Stage extends EventEmitter {
             if (distance) {
                 coords[direction.effective % 2] +=
                     distance * (direction.effective & 2 ? 1 : -1);
-    
+
                 coords[direction.effective % 2] = Math.min(
                     Math.max(0, coords[direction.effective % 2]),
                     this.tileMap[direction.effective % 2 ? 'height' : 'width'] - 1
@@ -163,34 +112,6 @@ export class Stage extends EventEmitter {
             clearInterval(this.#interval);
             this.#interval = null;
         }
-
-        return this;
-    }
-}
-
-export class Server {
-    #protocols: Protocol[];
-    #stages: Stage[];
-
-    constructor() {
-        this.#protocols = [];
-        this.#stages = [];
-    }
-
-    registerProtocol(protocol: Protocol): Server {
-        this.#protocols.push(protocol);
-
-        for (let stage of this.#stages)
-            protocol.emit('stageRegistered', stage);
-
-        return this;
-    }
-
-    registerStage(stage: Stage): Server {
-        this.#stages.push(stage);
-
-        for (let protocol of this.#protocols)
-            protocol.emit('stageRegistered', stage);
 
         return this;
     }

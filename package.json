@@ -1,9 +1,18 @@
 {
     "name": "paint-io-teams-server",
     "license": "Apache-2.0",
+    "bin": "bin/server.js",
+    "main": "lib/index.js",
+    "type": "module",
+    "files": [
+        "bin/",
+        "lib/",
+        "!**/*.tsbuildinfo"
+    ],
     "scripts": {
-        "build": "mkdir -p src/generated && echo \"{\\\"version\\\":\\\"$(git describe --always --dirty 2>/dev/null)\\\"}\" > src/generated/version.json; tsc -b",
-        "start": "node dist/index.js"
+        "clean": "tsc -b --clean src/bin/ src/lib/ && rm -r src/lib/generated/ 2>/dev/null || :",
+        "prepare": "mkdir -p src/lib/generated/ && echo \"export const VERSION = '$(git describe --always --dirty 2>/dev/null || echo unknown)';\" > src/lib/generated/version.ts && tsc -b src/bin/ src/lib/ && chmod +x bin/*",
+        "start": "bin/server.js"
     },
     "dependencies": {
         "socket.io": "^4.3.1"

@@ -1,8 +1,7 @@
 import { Socket } from 'socket.io';
 
-import { LegacyProtocol } from '.';
-import { Stage } from '../../model';
-import { LegacyProtocolService } from './model';
+import { LegacyProtocol } from '../index.js';
+import { LegacyProtocolService } from './index.js';
 
 export class CatchAllService extends LegacyProtocolService {
     constructor(

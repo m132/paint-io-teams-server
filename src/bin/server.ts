@@ -1,5 +1,6 @@
-import { Server, Stage } from './model';
-import { LegacyProtocol } from './protocol/legacy';
+#!/usr/bin/env node
+import { LegacyProtocol } from '../lib/protocol/legacy/index.js';
+import { Server, Stage } from '../lib/index.js';
 
 new Server()
     .registerStage(new Stage('main').start(50))

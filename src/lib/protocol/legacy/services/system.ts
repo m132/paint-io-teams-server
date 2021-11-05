@@ -1,9 +1,8 @@
 import { Socket } from 'socket.io';
 
-import { version } from '../../generated/version.json';
-
-import { LegacyProtocol } from '.';
-import { LegacyProtocolService, LegacyPlayer, serializePlayer } from './model';
+import { VERSION } from '../../../index.js';
+import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
+import { LegacyProtocolService } from './index.js';
 
 export class SystemService extends LegacyProtocolService {
     constructor(
@@ -55,7 +54,7 @@ export class SystemService extends LegacyProtocolService {
             isRoundRestartInProgress: false,
             winPercentLimit: 70,
             teamCount: 4,
-            buildNumber: version,
+            buildNumber: VERSION,
             mapData: [[66, 35, 1], [36, 36, 1], [37, 36, 1], [38, 36, 1], [39, 36, 1], [34, 37, 1],
             [35, 37, 1], [33, 38, 1], [32, 39, 1], [31, 40, 1], [31, 41, 1], [47, 41, 1],
             [48, 41, 1], [49, 41, 1], [55, 41, 1], [65, 41, 1], [31, 42, 1], [46, 42, 1],
