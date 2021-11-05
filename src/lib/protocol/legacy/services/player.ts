@@ -1,6 +1,9 @@
+import { logger as parentLogger } from '../../../log/index.js';
 import { Direction, Stage } from '../../../index.js';
 import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
 import { LegacyProtocolService } from './index.js';
+
+const logger = parentLogger.sub('LegacyProtocol', 'PlayerService');
 
 export class PlayerService extends LegacyProtocolService {
     constructor(protocol: LegacyProtocol) {
@@ -47,7 +50,7 @@ export class PlayerService extends LegacyProtocolService {
                     player.direction.requested = Direction.DOWN;
                     break;
                 default:
-                    console.warn(`LEGACY#${player.id}: Player issued an unknown input action:`, escape(action));
+                    logger.warn(`LEGACY#${player.id}: Player issued an unknown input action: ${action}`);
             }
     };
 

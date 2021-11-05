@@ -1,7 +1,10 @@
 import { Socket } from 'socket.io';
 
+import { logger as parentLogger } from '../../../log/index.js';
 import { LegacyPlayer, LegacyProtocol } from '../index.js';
 import { LegacyProtocolService } from './index.js';
+
+const logger = parentLogger.sub('LegacyProtocol', 'PingService');
 
 export class PingService extends LegacyProtocolService {
     constructor(protocol: LegacyProtocol) {
@@ -12,7 +15,7 @@ export class PingService extends LegacyProtocolService {
 
     #onConnection = (socket: Socket) => {
         socket.on('sendPing', () => {
-            console.log(`LEGACY#${socket.id}: Pong`);
+            logger.debug(`LEGACY#${socket.id}: Pong`);
             socket.emit('sendPong');
         });
         socket.emit('ready');

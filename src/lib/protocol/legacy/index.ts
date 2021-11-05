@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 
 import { Server, Socket } from 'socket.io';
 
+import { logger as parentLogger } from '../../log/index.js';
 import { Direction, Player, Stage } from '../../index.js';
 import { Protocol } from '../index.js';
 import { LegacyProtocolService } from './services/index.js';
@@ -9,6 +10,8 @@ import { CatchAllService } from './services/catch-all.js';
 import { PingService } from './services/ping.js';
 import { PlayerService } from './services/player.js';
 import { SystemService } from './services/system.js';
+
+const logger = parentLogger.sub('LegacyProtocol');
 
 type SerializedFacing = 'left' | 'up' | 'right' | 'down';
 
@@ -65,7 +68,6 @@ export class LegacyPlayer extends Player {
     }
 }
 
-
 export class LegacyProtocol extends EventEmitter implements Protocol {
     stages: Stage[];
     io: Server;
@@ -97,17 +99,21 @@ export class LegacyProtocol extends EventEmitter implements Protocol {
 
             for (let service of this.services)
                 service.onStageRegistered(stage);
+
+            logger.debug(`Attached to stage ${stage.id}`);
         });
+
+        logger.info('Listening on http://localhost:3000/');
     }
 
     #handleConnection(socket: Socket) {
         /* TODO: expose information in a generic manner here */
         this.emit('connection');
-        console.log(`LEGACY#${socket.id}: New connection from ${socket.handshake.address}`);
+        logger.info(`LEGACY#${socket.id}: New connection from ${socket.handshake.address}`);
 
         socket.on('disconnect', (reason) => {
             this.emit('disconnect');
-            console.log(`LEGACY#${socket.id}: Disconnected (${reason})`);
+            logger.info(`LEGACY#${socket.id}: Disconnected (${reason})`);
         });
     }
 }

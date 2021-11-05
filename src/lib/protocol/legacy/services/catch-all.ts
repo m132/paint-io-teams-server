@@ -1,7 +1,10 @@
 import { Socket } from 'socket.io';
 
+import { logger as parentLogger } from '../../../log/index.js';
 import { LegacyProtocol } from '../index.js';
 import { LegacyProtocolService } from './index.js';
+
+const logger = parentLogger.sub('LegacyProtocol', 'CatchAllService');
 
 export class CatchAllService extends LegacyProtocolService {
     constructor(protocol: LegacyProtocol) {
@@ -20,7 +23,7 @@ export class CatchAllService extends LegacyProtocolService {
                 case 'PlayerMessagesToServer':
                     break;
                 default:
-                    console.warn(`LEGACY#${socket.id}: Unknown event received:`, event);
+                    logger.warn(`LEGACY#${socket.id}: Unknown event received: ${event}`);
             }
         });
 }

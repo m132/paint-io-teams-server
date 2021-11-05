@@ -1,8 +1,11 @@
 import { Socket } from 'socket.io';
 
+import { logger as parentLogger } from '../../../log/index.js';
 import { VERSION } from '../../../index.js';
 import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
 import { LegacyProtocolService } from './index.js';
+
+const logger = parentLogger.sub('LegacyProtocol', 'SystemService');
 
 export class SystemService extends LegacyProtocolService {
     constructor(protocol: LegacyProtocol) {
@@ -18,7 +21,7 @@ export class SystemService extends LegacyProtocolService {
             )
         );
 
-        console.log(`LEGACY#${socket.id}: Logged in as ${handshake.name} from ${handshake.country}`);
+        logger.info(`LEGACY#${socket.id}: Logged in as ${handshake.name} from ${handshake.country}`);
         let player = socket.data.player = new LegacyPlayer(socket);
         let stage = this.protocol.stages[0];
 
