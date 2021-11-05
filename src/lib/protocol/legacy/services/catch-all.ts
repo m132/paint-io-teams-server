@@ -4,9 +4,7 @@ import { LegacyProtocol } from '../index.js';
 import { LegacyProtocolService } from './index.js';
 
 export class CatchAllService extends LegacyProtocolService {
-    constructor(
-        public protocol: LegacyProtocol
-    ) {
+    constructor(protocol: LegacyProtocol) {
         super(protocol);
         protocol.io.on('connection', this.#onConnection)
     }

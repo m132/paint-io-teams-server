@@ -4,7 +4,7 @@
     "compilerOptions": {
         /* type checking */
         "exactOptionalPropertyTypes": true,
-        // "noImplicitOverride": true, // read morea bout this
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
         "strict": true,
 
@@ -18,7 +18,6 @@
         "removeComments": true,
 
         /* interop constraints */
-        // "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
 
         /* language and environment */
@@ -27,8 +26,5 @@
 
         /* projects */
         "composite": true
-
-        /* output formatting */
-        // "skipLibCheck": true
     }
 }

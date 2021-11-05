@@ -3,16 +3,14 @@ import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
 import { LegacyProtocolService } from './index.js';
 
 export class PlayerService extends LegacyProtocolService {
-    constructor(
-        public protocol: LegacyProtocol
-    ) {
+    constructor(protocol: LegacyProtocol) {
         super(protocol);
 
         for (let stage of protocol.stages)
             this.onStageRegistered(stage);
     }
 
-    onStageRegistered = (stage: Stage) => {
+    override onStageRegistered = (stage: Stage) => {
         let stageRoom = this.protocol.io.to(`stage:${stage.id}`);
 
         stage.on('playerJoined', (player) =>
@@ -25,7 +23,7 @@ export class PlayerService extends LegacyProtocolService {
             stageRoom.emit('PlayersUpdate', stage.players.map((p) => serializePlayer(p, stage))));
     };
 
-    onPlayerRegistered = (player: LegacyPlayer) => {
+    override onPlayerRegistered = (player: LegacyPlayer) => {
         player.socket.on('PlayerControlsInputAction', (action) =>
             this.#onInputAction(player, action));
         player.socket.on('PlayerMessagesToServer', (message) =>

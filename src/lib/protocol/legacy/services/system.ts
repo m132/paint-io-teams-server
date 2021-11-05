@@ -5,9 +5,7 @@ import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
 import { LegacyProtocolService } from './index.js';
 
 export class SystemService extends LegacyProtocolService {
-    constructor(
-        public protocol: LegacyProtocol
-    ) {
+    constructor(protocol: LegacyProtocol) {
         super(protocol);
         this.protocol.io.on('connection', this.#onConnection);
     }

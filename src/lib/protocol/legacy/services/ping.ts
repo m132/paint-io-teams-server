@@ -4,9 +4,7 @@ import { LegacyPlayer, LegacyProtocol } from '../index.js';
 import { LegacyProtocolService } from './index.js';
 
 export class PingService extends LegacyProtocolService {
-    constructor(
-        public protocol: LegacyProtocol
-    ) {
+    constructor(protocol: LegacyProtocol) {
         super(protocol);
 
         this.protocol.io.on('connection', this.#onConnection);
@@ -20,7 +18,7 @@ export class PingService extends LegacyProtocolService {
         socket.emit('ready');
     }
 
-    onPlayerRegistered = (player: LegacyPlayer) => {
+    override onPlayerRegistered = (player: LegacyPlayer) => {
         let offset = performance.now();
 
         player.pingInterval = setInterval(() =>
@@ -32,7 +30,7 @@ export class PingService extends LegacyProtocolService {
         );
     };
 
-    onPlayerUnregistered = (player: LegacyPlayer) => {
+    override onPlayerUnregistered = (player: LegacyPlayer) => {
         if (player.pingInterval)
             clearInterval(player.pingInterval);
         player.pingInterval = null;
