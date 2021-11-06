@@ -14,3 +14,12 @@ export enum Direction {
     RIGHT = 2,
     DOWN = 3
 }
+
+export enum Team {
+    SPECTATOR = 99,
+    NEUTRAL = 0,
+    FIRST = 1,
+    SECOND = 2,
+    THIRD = 3,
+    FOURTH = 4
+}
