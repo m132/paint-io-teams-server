@@ -45,52 +45,15 @@ export class Stage extends EventEmitter {
     }
 
     tick(elapsedMs: number): this {
-        let delta = elapsedMs / 1000;
-        this.emit('beforeTick', delta);
+        this.emit('beforeTick', elapsedMs);
 
-        /* interpolate coordinates of all players */
-        this.players.forEach((player: Player) => {
-            let coords = player.coordinates;
-            let direction = player.direction;
+        for (let player of this.players) {
+            let diff = player.interpolate(elapsedMs);
+            player.direction.effective = diff.direction;
+            player.coordinates = diff.coordinates;
+        }
 
-            let distance = delta * player.velocity;
-            let effectiveAxis = direction.effective % 2;
-            let effectiveAxisMax = this.tileMap[effectiveAxis ? 'height' : 'width'] - 1;
-
-            if (direction.effective & 2 ?
-                coords[effectiveAxis] === effectiveAxisMax :
-                coords[effectiveAxis] === 0)
-                distance = 0;
-
-            if (direction.requested % 2 === effectiveAxis)
-                direction.effective = direction.requested;
-            else {
-                let alignmentDelta = Math.abs(
-                    coords
-                        .aligned(direction.effective, true)
-                        .subtract(coords)
-                        [effectiveAxis]
-                );
-
-                if (distance >= alignmentDelta) {
-                    coords.align(direction.effective, true);
-                    direction.effective = direction.requested;
-                    distance -= alignmentDelta;
-                }
-            }
-
-            if (distance) {
-                coords[direction.effective % 2] +=
-                    distance * (direction.effective & 2 ? 1 : -1);
-
-                coords[direction.effective % 2] = Math.min(
-                    Math.max(0, coords[direction.effective % 2]),
-                    this.tileMap[direction.effective % 2 ? 'height' : 'width'] - 1
-                );
-            }
-        });
-
-        this.emit('tick', delta);
+        this.emit('tick', elapsedMs);
         return this;
     }
 
