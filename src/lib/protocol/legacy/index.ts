@@ -44,7 +44,7 @@ export function serializePlayer(player: Player, stage: Stage) {
         id: player.id,
         name: player.name,
         country: player.country,
-        teamId: 1,
+        teamId: player.team,
         characterId: player.characterId,
         ping: Math.round(player.ping),
         x: Math.round(player.coordinates[0] * 32) + 16,

@@ -37,7 +37,7 @@ export class SystemService extends LegacyProtocolService {
         socket.emit('SystemHandshakeServer', {
             x: Math.round(player.coordinates[0] * 32) + 16,
             y: Math.round(player.coordinates[1] * 32) + 16,
-            teamId: 1,
+            teamId: player.team,
             isDead: false,
             isAdmin: false,
             activeShield: false,

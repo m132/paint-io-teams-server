@@ -1,5 +1,5 @@
 import { Coordinates } from './coordinates.js';
-import { Direction } from './index.js';
+import { Direction, Team } from './index.js';
 import { Stage } from './stage.js';
 
 export class Player {
@@ -8,6 +8,7 @@ export class Player {
     country: string = '';
     characterId: number = 0;
 
+    team: Team = Team.FIRST;
     coordinates: Coordinates;
     direction: {
         effective: Direction,

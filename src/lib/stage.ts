@@ -30,7 +30,8 @@ export class Stage extends EventEmitter {
                 Math.round(Math.random() * (this.tileMap.width - 1)),
                 Math.round(Math.random() * (this.tileMap.height - 1))
             ),
-            stage: this
+            stage: this,
+            team: Math.round(1 + Math.random() * 3)
         });
 
         this.players.push(player);
