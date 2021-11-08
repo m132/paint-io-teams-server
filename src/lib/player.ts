@@ -1,4 +1,5 @@
-import { Coordinates, Direction } from './index.js';
+import { Coordinates } from './coordinates.js';
+import { Direction } from './index.js';
 import { Stage } from './stage.js';
 
 export class Player {
@@ -18,7 +19,7 @@ export class Player {
     ping: number = 0;
 
     constructor() {
-        this.coordinates = [0, 0];
+        this.coordinates = new Coordinates(0, 0);
         this.direction = {
             effective: Direction.DOWN,
             requested: Direction.DOWN

@@ -5,8 +5,6 @@ export { Stage } from './stage.js';
 export { TileMap } from './tilemap.js';
 export { VERSION } from './generated/version.js';
 
-export type Coordinates = [x: number, y: number];
-
 /* odd are assumed to be horizontal, even are consequently vertical */
 export enum Direction {
     LEFT = 0,

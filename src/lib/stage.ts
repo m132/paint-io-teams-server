@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 
+import { Coordinates } from './coordinates.js';
 import { Player } from './player.js';
 import { TileMap } from './tilemap.js';
 
@@ -24,10 +25,10 @@ export class Stage extends EventEmitter {
 
     addPlayer(player: Player): Stage {
         player.update({
-            coordinates: [
+            coordinates: new Coordinates(
                 Math.round(Math.random() * (this.tileMap.width - 1)),
                 Math.round(Math.random() * (this.tileMap.height - 1))
-            ],
+            ),
             stage: this
         });
 
@@ -64,20 +65,17 @@ export class Stage extends EventEmitter {
             if (direction.requested % 2 === effectiveAxis)
                 direction.effective = direction.requested;
             else {
-                /* remaining blocks to move across before changing direction */
-                let alignmentDelta = direction.effective & 2 ?
-                    1 - coords[effectiveAxis] % 1 :
-                    coords[effectiveAxis] % 1;
-
-                if (alignmentDelta === 1)
-                    alignmentDelta = 0;
+                let alignmentDelta = Math.abs(
+                    coords
+                        .aligned(direction.effective, true)
+                        .subtract(coords)
+                        [effectiveAxis]
+                );
 
                 if (distance >= alignmentDelta) {
-                    coords[effectiveAxis] =
-                        (direction.effective & 2 ? Math.ceil : Math.floor)
-                            (coords[effectiveAxis]);
-                    distance -= alignmentDelta;
+                    coords.align(direction.effective, true);
                     direction.effective = direction.requested;
+                    distance -= alignmentDelta;
                 }
             }
 
