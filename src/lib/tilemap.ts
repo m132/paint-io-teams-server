@@ -1,4 +1,4 @@
-import { Team } from './index.js';
+import { Player, Team } from './index.js';
 
 const initialState = [
     [66, 35], [36, 36], [37, 36], [38, 36], [39, 36], [34, 37],
@@ -41,7 +41,7 @@ const initialState = [
 ];
 
 export class TileMap {
-    state: [tile: Team, tail: Team][][];
+    state: [tile: Team, tail: Player[]][][];
 
     constructor(
         public width: number,
@@ -51,7 +51,7 @@ export class TileMap {
         this.height = height;
 
         this.state = Array.from({ length: height }, () => (
-            Array.from({ length: width }, () => [Team.NEUTRAL, Team.NEUTRAL])
+            Array.from({ length: width }, () => [Team.NEUTRAL, []])
         ));
 
         for (let tile of initialState)
