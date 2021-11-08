@@ -11,6 +11,7 @@ import { CatchAllService } from './services/catch-all.js';
 import { PingService } from './services/ping.js';
 import { PlayerService } from './services/player.js';
 import { SystemService } from './services/system.js';
+import { TilesService } from './services/tiles.js';
 
 const logger = parentLogger.sub('LegacyProtocol');
 
@@ -98,6 +99,7 @@ export class LegacyProtocol extends EventEmitter implements Protocol {
             new PingService(this),
             new SystemService(this),
             new PlayerService(this),
+            new TilesService(this),
             new CatchAllService(this)
         ];
 

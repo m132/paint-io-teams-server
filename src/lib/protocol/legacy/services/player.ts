@@ -1,5 +1,5 @@
 import { logger as parentLogger } from '../../../log/index.js';
-import { Direction, Stage } from '../../../index.js';
+import { DeathNews, Direction, Player, Stage } from '../../../index.js';
 import { LegacyPlayer, LegacyProtocol, serializePlayer } from '../index.js';
 import { LegacyProtocolService } from './index.js';
 
@@ -24,6 +24,22 @@ export class PlayerService extends LegacyProtocolService {
             stageRoom.emit('PlayerMessagesFromServer', { clientId: player.id, messageId: message }));
         stage.on('tick', () =>
             stageRoom.emit('PlayersUpdate', stage.players.map((p) => serializePlayer(p, stage))));
+        stage.on('playersRespawned', (players: Player[]) =>
+            players.forEach(player => 
+                stageRoom.emit({Request: "PlayerRespawnRequest", Accept: "PlayerRespawnAccept"} as any, player.id)));
+        stage.on('playersDead', (deaths: DeathNews) =>
+            deaths.forEach(death =>
+                stageRoom.emit('PlayerDead', {
+                    attacker: death.attacker.id,
+                    attackerTeamId: death.attacker.team,
+                    damageType: 'player',
+                    victim: death.victim.id,
+                    victimTeamId: death.victim.team,
+                    x: death.victim.coordinates[0],
+                    y: death.victim.coordinates[1]
+                })
+            )
+        );
     };
 
     override onPlayerRegistered = (player: LegacyPlayer) => {

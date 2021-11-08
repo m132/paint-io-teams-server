@@ -1,5 +1,7 @@
 
-export { Player } from './player.js';
+import { Coordinates } from './coordinates.js';
+import { Player } from './player.js';
+export { Player };
 export { Server } from './server.js';
 export { Stage } from './stage.js';
 export { TileMap } from './tilemap.js';
@@ -21,3 +23,9 @@ export enum Team {
     THIRD = 3,
     FOURTH = 4
 }
+
+export type DeathNews = {
+    attacker: Player,
+    victim: Player,
+    coordinates: Coordinates
+}[];

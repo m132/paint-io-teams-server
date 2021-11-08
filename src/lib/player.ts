@@ -16,6 +16,9 @@ export class Player {
     };
     velocity: number = 4;
     stage: Stage | null = null;
+    tail: Coordinates[];
+    spawned: number = Infinity;
+    respawnMs: number = 5000;
 
     ping: number = 0;
 
@@ -25,6 +28,7 @@ export class Player {
             effective: Direction.DOWN,
             requested: Direction.DOWN
         }
+        this.tail = [];
     }
 
     /* TODO: refactor the following behemoths */
