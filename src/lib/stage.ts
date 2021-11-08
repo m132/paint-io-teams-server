@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { performance } from 'perf_hooks';
 
 import { Coordinates } from './coordinates.js';
 import { Player } from './player.js';

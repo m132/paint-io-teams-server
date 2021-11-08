@@ -123,3 +123,4 @@ generated/
 # build artifacts
 /bin/
 /lib/
+/test/

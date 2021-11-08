@@ -12,13 +12,21 @@
     "scripts": {
         "clean": "tsc -b --clean src/bin/ src/lib/ && rm -r src/lib/generated/ 2>/dev/null || :",
         "prepare": "mkdir -p src/lib/generated/ && echo \"export const VERSION = '$(git describe --always --dirty 2>/dev/null || echo unknown)';\" > src/lib/generated/version.ts && tsc -b src/bin/ src/lib/ && chmod +x bin/*",
-        "start": "bin/server.js"
+        "start": "bin/server.js",
+        "test": "tsc -b src/test/ && node --experimental-vm-modules node_modules/.bin/jest"
     },
     "dependencies": {
         "commander": "^8.3.0",
         "socket.io": "^4.3.1"
     },
     "devDependencies": {
+        "@types/jest": "^27.0.2",
+        "jest": "^27.3.1",
         "typescript": "^4.4.4"
+    },
+    "jest": {
+        "testMatch": [
+            "<rootDir>/test/*.js"
+        ]
     }
 }
