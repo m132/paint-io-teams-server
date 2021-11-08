@@ -55,6 +55,6 @@ export class TileMap {
         ));
 
         for (let tile of initialState)
-            this.state[tile[1]][tile[0]][0] = Team.FIRST;
+            this.state[tile[1]][tile[0]][0] = 1 + Math.floor((tile[1] - 36) / 10.5);
     }
 }
