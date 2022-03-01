@@ -19,3 +19,6 @@ bin/server.js --help
 
 ## Bugs
 The server is still under development, and as such, we don't currently accept bug reports.
+
+## Join our Telegram group!
+[@PaintTG](https://t.me/PaintTG)
